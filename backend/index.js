@@ -12,7 +12,7 @@ yargs(hideBin(process.argv))
     .command("init", "Initialize the application", {}, initController) 
 
     //add
-    .command("add <filename>", "Add new file", (yargs)=>{yargs.positional('filename', {type: 'string', describe: 'Name of the file to add'})},addController)
+    .command("add <filename>", "Add new file", (yargs)=>{yargs.positional('filename', {type: 'string', describe: 'Name of the file to add'})},(argv)=>{addController(argv.filename)})
 
     //commit
     .command("commit -m <message>", "Commit changes", (yargs)=>{yargs.positional('message', {type: 'string', describe: 'Commit message'})},commitController)
