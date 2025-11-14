@@ -5,7 +5,7 @@ import {addController} from './controllers/add.js';
 import {commitController} from './controllers/commit.js';
 import {pushController} from './controllers/push.js';
 import {pullController} from './controllers/pull.js';
-import {revertController} from './controllers/revert.js';
+
 
 yargs(hideBin(process.argv))
     //init
@@ -25,7 +25,6 @@ yargs(hideBin(process.argv))
     .command("pull", "Pull changes from remote", {}, pullController)
 
     //revert
-    .command("revert <commitId>", "Revert to a specific commit", (yargs)=>{yargs.positional('commitId', {type: 'string', describe: 'ID of the commit to revert to'})},revertController)
     .demandCommand(1, "You need to specify at least one command")
     .help()
     .argv;
