@@ -15,7 +15,8 @@ yargs(hideBin(process.argv))
     .command("add <filename>", "Add new file", (yargs)=>{yargs.positional('filename', {type: 'string', describe: 'Name of the file to add'})},(argv)=>{addController(argv.filename)})
 
     //commit
-    .command("commit -m <message>", "Commit changes", (yargs)=>{yargs.positional('message', {type: 'string', describe: 'Commit message'})},commitController)
+    .command("commit <message>", "Commit changes", (yargs)=>{yargs.positional('message', {type: 'string', describe: 'Commit message'})},
+    (argv)=>{commitController(argv.message)})
 
     //push
     .command("push", "Push changes to remote", {}, pushController)
