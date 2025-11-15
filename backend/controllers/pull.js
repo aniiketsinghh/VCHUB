@@ -8,7 +8,11 @@ export const pullController = async() => {
     const commitsDir = path.join(mainDir, 'commits');
 
     try{
-        const data= await s3.listObjectsV2({ Bucket: BUCKET_NAME, Prefix: 'commits/' }).promise();
+        const data= await s3.listObjectsV2({ 
+            Bucket: BUCKET_NAME,
+             Prefix: 'commits/'
+             }).promise();
+             
         const objects= data.Contents;
         for(const object of objects){
 
@@ -25,7 +29,7 @@ export const pullController = async() => {
               await fs.writeFile(path.join(mainDir, key), fileData.Body);
 
            }
-
+           console.log("All commits pulled from S3 successfully.");
 
     }catch(err){
         console.error("Error in pullController:", err.message);
