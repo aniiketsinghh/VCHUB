@@ -5,6 +5,9 @@ import http from 'http';
 import {Server} from 'socket.io';
 import connectDb from './DB connection/db.js';
 import mongoose from 'mongoose';
+import userRoutes from './routes/user.route.js';
+import repoRoutes from './routes/repo.route.js';
+import issueRoutes from './routes/issue.route.js';
 
 dotenv.config();
 
@@ -14,11 +17,11 @@ import yargs from 'yargs';
 import {hideBin} from 'yargs/helpers';
 
 //Controllers
-import {initController} from './controllers/init.js';
-import {addController} from './controllers/add.js';
-import {commitController} from './controllers/commit.js';
-import {pushController} from './controllers/push.js';
-import {pullController} from './controllers/pull.js';
+import {initController} from './controllers/commands/init.js';
+import {addController} from './controllers/commands/add.js';
+import {commitController} from './controllers/commands/commit.js';
+import {pushController} from './controllers/commands/push.js';
+import {pullController} from './controllers/commands/pull.js';
 
 //server function
  const serverFunction = ()=>{
@@ -33,6 +36,10 @@ import {pullController} from './controllers/pull.js';
     app.use(express.json());
     app.use(express.urlencoded({extended: false}));
 
+    app.use('/api/user', userRoutes);
+    app.use('/api/repo', repoRoutes);
+    app.use('/api/issue', issueRoutes);
+
     const httpServer = http.createServer(app);
     const io= new Server (httpServer,{
         cors:{
@@ -40,6 +47,7 @@ import {pullController} from './controllers/pull.js';
             methods: ['GET', 'POST']
         }
     })
+
     let user="test";
     io.on("connection",(socket)=>{
         socket.on("",(userID)=>{
