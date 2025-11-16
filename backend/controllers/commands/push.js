@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import {s3, BUCKET_NAME } from '../aws-config/aws.config.js';
+import {s3, BUCKET_NAME } from '../../aws-config/aws.config.js';
 
 
 export const pushController = async()=>{
