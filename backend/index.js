@@ -4,6 +4,7 @@ import cors from 'cors';
 import http from 'http';
 import {Server} from 'socket.io';
 import connectDb from './DB connection/db.js';
+import mongoose from 'mongoose';
 
 dotenv.config();
 
@@ -39,9 +40,19 @@ import {pullController} from './controllers/pull.js';
             methods: ['GET', 'POST']
         }
     })
+    let user="test";
+    io.on("connection",(socket)=>{
+        socket.on("",(userID)=>{
+            user=userID;
+        })
+    })
 
+    const db = mongoose.connection;
+    db.once('open',async()=>{
+            console.log('CRUD opeartions called');
+    });
     connectDb().then(()=>{
-          app.listen(PORT ,()=>{
+          httpServer.listen(PORT ,()=>{
         console.log(`Server is running on port ${PORT}`);
     })
     });
