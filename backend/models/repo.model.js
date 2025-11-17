@@ -1,36 +1,28 @@
 import mongoose from "mongoose";
 
 const RepoSchema = new mongoose.Schema({
-    name:{
-        type: String,
-        required: true,
-    },
-    description:{
-        type: String
-    },
-    content:[
-        {
-            type: String
-        }
-    ],
-    visibility:{
-        type: String,
-    },
-    owner:{
+    name: { type: String, required: true },
+    description: { type: String },
+    content: [{ type: String }],
+    visibility: { type: String, default: "public" },
+
+    owner: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
-    issues:[
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Issue'
-        }
-    ]
 
-},{timestamps: true}
-);
+    issues: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Issue'
+    }],
 
-const Repository = mongoose.model('Repository', RepoSchema);
+    stars: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }]
+}, { timestamps: true });
 
-export default Repository;
+const Repo = mongoose.model('Repo', RepoSchema);
+
+export default Repo;

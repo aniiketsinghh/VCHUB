@@ -1,12 +1,165 @@
+import User from "../../models/user.model.js";
+import jwt from "jsonwebtoken";
 
+// Simple async wrapper for cleaner code
+const tryCatch = (fn) => async (req, res) => {
+  try {
+    await fn(req, res);
+  } catch (err) {
+    console.error("Controller Error:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
 
-export const createIssue=()=>{}
+const createToken = (userId) => {
+  return jwt.sign({ userId }, process.env.JWT_SECRET, {
+    expiresIn: "7d",
+  });
+};
 
-export const updateIssue=()=>{}
+// -------------------------------
+// SIGNUP
+// -------------------------------
+export const Signup = tryCatch(async (req, res) => {
+  const { username, email, password } = req.body;
 
-export const deleteIssue=()=>{}
+  // Validate email format
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!regex.test(email)) {
+    return res.status(400).json({ message: "Invalid email format" });
+  }
 
-export const getAllIssues=()=>{}
+  // Check if user already exists
+  const existingUser = await User.findOne({
+    $or: [{ email }, { username }],
+  });
 
-export const getIssueById=()=>{}
+  if (existingUser) {
+    return res.status(400).json({ message: "User already exists" });
+  }
 
+  const newUser = new User({
+    username,
+    email,
+    password,
+    repositories: [],
+    followedUsers: [],
+    starRepos: [],
+  });
+
+  await newUser.save();
+
+  const token = createToken(newUser._id);
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    sameSite: "strict",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  });
+
+  return res.status(201).json({
+    message: "User registered successfully",
+    user: newUser,
+    token,
+  });
+});
+
+// -------------------------------
+// LOGIN
+// -------------------------------
+export const Login = tryCatch(async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+  if (!user)
+    return res.status(404).json({ message: "User not found" });
+
+  const isValid = await user.comparePassword(password);
+  if (!isValid)
+    return res.status(401).json({ message: "Invalid credentials" });
+
+  const token = createToken(user._id);
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    sameSite: "strict",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
+  return res.status(200).json({
+    message: "Login successful",
+    user,
+    token,
+  });
+});
+
+// -------------------------------
+// GET ALL USERS
+// -------------------------------
+export const GetAllUsers = tryCatch(async (req, res) => {
+  const users = await User.find({});
+
+  if (users.length === 0)
+    return res.status(404).json({ message: "No users found" });
+
+  return res.status(200).json({ users });
+});
+
+// -------------------------------
+// GET USER PROFILE
+// -------------------------------
+export const GetUserProfile = tryCatch(async (req, res) => {
+  const { userId } = req.params;
+
+  const user = await User.findById(userId);
+  if (!user)
+    return res.status(404).json({ message: "User not found" });
+
+  return res.status(200).json({ user });
+});
+
+// -------------------------------
+// UPDATE USER PROFILE (secure & correct)
+// -------------------------------
+export const UpdateUserProfile = tryCatch(async (req, res) => {
+  const { userId } = req.params;
+  const { username, email, password } = req.body;
+
+  const user = await User.findById(userId);
+  if (!user)
+    return res.status(404).json({ message: "User not found" });
+
+  if (username) user.username = username;
+  if (email) user.email = email;
+  if (password) user.password = password; // triggers hashing via pre-save
+
+  await user.save();
+
+  return res
+    .status(200)
+    .json({ message: "User updated successfully", user });
+});
+
+// -------------------------------
+// DELETE USER PROFILE
+// -------------------------------
+export const DeleteUserProfile = tryCatch(async (req, res) => {
+  const { userId } = req.params;
+  const { password } = req.body;
+
+  const user = await User.findById(userId);
+  if (!user)
+    return res.status(404).json({ message: "User not found" });
+
+  const isValid = await user.comparePassword(password);
+  if (!isValid)
+    return res.status(401).json({ message: "Invalid credentials" });
+
+  await user.remove();
+
+  res.clearCookie("token");
+
+  return res.status(200).json({
+    message: "User deleted successfully",
+  });
+});
