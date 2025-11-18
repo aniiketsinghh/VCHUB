@@ -1,165 +1,97 @@
-import User from "../../models/user.model.js";
-import jwt from "jsonwebtoken";
+import Issue from "../../models/issue.model.js";
 
-// Simple async wrapper for cleaner code
-const tryCatch = (fn) => async (req, res) => {
+// CREATE ISSUE
+export const createIssue = async (req, res) => {
   try {
-    await fn(req, res);
-  } catch (err) {
-    console.error("Controller Error:", err);
-    return res.status(500).json({ message: "Internal server error" });
+    const { title, description, status, repository } = req.body;
+
+    if (!title || !repository) {
+      return res.status(400).json({ message: "Title and Repository are required" });
+    }
+
+    const newIssue = await Issue.create({
+      title,
+      description,
+      status: status || "open",
+      repository,
+    });
+
+    return res.status(201).json({
+      message: "Issue created successfully",
+      issue: newIssue,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
-const createToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET, {
-    expiresIn: "7d",
-  });
+// UPDATE ISSUE
+export const updateIssue = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const updatedIssue = await Issue.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updatedIssue) {
+      return res.status(404).json({ message: "Issue not found" });
+    }
+
+    return res.status(200).json({
+      message: "Issue updated successfully",
+      issue: updatedIssue,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error", error });
+  }
 };
 
-// -------------------------------
-// SIGNUP
-// -------------------------------
-export const Signup = tryCatch(async (req, res) => {
-  const { username, email, password } = req.body;
+// DELETE ISSUE
+export const deleteIssue = async (req, res) => {
+  try {
+    const { id } = req.params;
 
-  // Validate email format
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!regex.test(email)) {
-    return res.status(400).json({ message: "Invalid email format" });
+    const deleted = await Issue.findByIdAndDelete(id);
+
+    if (!deleted) {
+      return res.status(404).json({ message: "Issue not found" });
+    }
+
+    return res.status(200).json({ message: "Issue deleted successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error", error });
   }
+};
 
-  // Check if user already exists
-  const existingUser = await User.findOne({
-    $or: [{ email }, { username }],
-  });
+// GET ALL ISSUES
+export const getAllIssues = async (req, res) => {
+  try {
+    const issues = await Issue.find().populate("repository");
 
-  if (existingUser) {
-    return res.status(400).json({ message: "User already exists" });
+    return res.status(200).json({
+      count: issues.length,
+      issues,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error", error });
   }
+};
 
-  const newUser = new User({
-    username,
-    email,
-    password,
-    repositories: [],
-    followedUsers: [],
-    starRepos: [],
-  });
+// GET ISSUE BY ID
+export const getIssueById = async (req, res) => {
+  try {
+    const { id } = req.params;
 
-  await newUser.save();
+    const issue = await Issue.findById(id).populate("repository");
 
-  const token = createToken(newUser._id);
+    if (!issue) {
+      return res.status(404).json({ message: "Issue not found" });
+    }
 
-  res.cookie("token", token, {
-    httpOnly: true,
-    sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-  });
-
-  return res.status(201).json({
-    message: "User registered successfully",
-    user: newUser,
-    token,
-  });
-});
-
-// -------------------------------
-// LOGIN
-// -------------------------------
-export const Login = tryCatch(async (req, res) => {
-  const { email, password } = req.body;
-
-  const user = await User.findOne({ email });
-  if (!user)
-    return res.status(404).json({ message: "User not found" });
-
-  const isValid = await user.comparePassword(password);
-  if (!isValid)
-    return res.status(401).json({ message: "Invalid credentials" });
-
-  const token = createToken(user._id);
-
-  res.cookie("token", token, {
-    httpOnly: true,
-    sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
-
-  return res.status(200).json({
-    message: "Login successful",
-    user,
-    token,
-  });
-});
-
-// -------------------------------
-// GET ALL USERS
-// -------------------------------
-export const GetAllUsers = tryCatch(async (req, res) => {
-  const users = await User.find({});
-
-  if (users.length === 0)
-    return res.status(404).json({ message: "No users found" });
-
-  return res.status(200).json({ users });
-});
-
-// -------------------------------
-// GET USER PROFILE
-// -------------------------------
-export const GetUserProfile = tryCatch(async (req, res) => {
-  const { userId } = req.params;
-
-  const user = await User.findById(userId);
-  if (!user)
-    return res.status(404).json({ message: "User not found" });
-
-  return res.status(200).json({ user });
-});
-
-// -------------------------------
-// UPDATE USER PROFILE (secure & correct)
-// -------------------------------
-export const UpdateUserProfile = tryCatch(async (req, res) => {
-  const { userId } = req.params;
-  const { username, email, password } = req.body;
-
-  const user = await User.findById(userId);
-  if (!user)
-    return res.status(404).json({ message: "User not found" });
-
-  if (username) user.username = username;
-  if (email) user.email = email;
-  if (password) user.password = password; // triggers hashing via pre-save
-
-  await user.save();
-
-  return res
-    .status(200)
-    .json({ message: "User updated successfully", user });
-});
-
-// -------------------------------
-// DELETE USER PROFILE
-// -------------------------------
-export const DeleteUserProfile = tryCatch(async (req, res) => {
-  const { userId } = req.params;
-  const { password } = req.body;
-
-  const user = await User.findById(userId);
-  if (!user)
-    return res.status(404).json({ message: "User not found" });
-
-  const isValid = await user.comparePassword(password);
-  if (!isValid)
-    return res.status(401).json({ message: "Invalid credentials" });
-
-  await user.remove();
-
-  res.clearCookie("token");
-
-  return res.status(200).json({
-    message: "User deleted successfully",
-  });
-});
+    return res.status(200).json(issue);
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error", error });
+  }
+};

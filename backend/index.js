@@ -29,8 +29,10 @@ import {pullController} from './controllers/commands/pull.js';
     const PORT = process.env.PORT || 5000;
     app.use(cors(
         {
-        origin: '*',
+        origin: 'http://localhost:5173',
         credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+        allowedHeaders: ['Content-Type', 'Authorization']
         }
     ));
     app.use(express.json());
@@ -43,7 +45,7 @@ import {pullController} from './controllers/commands/pull.js';
     const httpServer = http.createServer(app);
     const io= new Server (httpServer,{
         cors:{
-            origin: '*',
+            origin: 'http://localhost:5173',
             methods: ['GET', 'POST']
         }
     })
