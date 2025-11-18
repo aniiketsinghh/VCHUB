@@ -1,6 +1,13 @@
-import { useState } from "react";
+import { useState} from "react";
+import axios from "axios";
+import { useAuth} from "../../context/useContext"
+import {useNavigate } from "react-router";
+
 
 const Signup = () => {
+
+    const {setUser}=useAuth();
+    const navigate=useNavigate();
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -9,11 +16,30 @@ const Signup = () => {
 
  
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    console.log(form);
-    // TODO: connect with backend
+    fetchingData();
   };
+
+  const fetchingData=async()=>{
+    
+    try{
+        const res=await axios.post("http://localhost:5006/api/user/signup",form,{
+            headers:{
+                "Content-Type":"application/json",
+            },
+            withCredentials:true,
+        })
+        console.log(res);
+        if(res.status===201){
+            setUser(res.data.user)
+            localStorage.setItem("userId",res.data.user._id);
+            navigate("/");
+        }
+    }catch(err){
+        console.error(err);
+    }
+  }
 
   return (
     <div className="w-full h-screen flex bg-gray-100">

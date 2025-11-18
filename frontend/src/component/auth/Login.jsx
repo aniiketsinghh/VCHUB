@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router";
+import axios from "axios";
+import { useAuth } from "../../context/useContext";
+import { useNavigate } from "react-router";
 
 const Login = () => {
+    const {setUser}=useAuth();
+    const navigate=useNavigate();
   const [form,setForm]=useState({
     email:"",
     password:"",
@@ -9,7 +14,28 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    fetchingData();
   };
+
+  const fetchingData=async()=>{
+    
+    try{
+        const res=await axios.post("http://localhost:5006/api/user/login",form,{
+            headers:{
+                "Content-Type":"application/json",
+            },
+            withCredentials:true,
+        })
+        console.log(res);
+        if(res.status===201){
+            setUser(res.data.user)
+            localStorage.setItem("userId",res.data.user._id);
+            navigate("/");
+        }
+    }catch(err){
+        console.error(err);
+    }
+  }
 
   return (
     <div className="min-h-screen flex">
