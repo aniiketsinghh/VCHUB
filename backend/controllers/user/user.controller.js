@@ -61,6 +61,7 @@ export const Signup = tryCatch(async (req, res) => {
     message: "User registered successfully",
     user: newUser,
     token,
+    userId: newUser._id
   });
 });
  
@@ -88,6 +89,7 @@ export const Login = tryCatch(async (req, res) => {
     message: "Login successful",
     user,
     token,
+    userId: user._id
   });
 });
 
@@ -103,9 +105,8 @@ export const GetAllUsers = tryCatch(async (req, res) => {
 
 //get profile
 export const GetUserProfile = tryCatch(async (req, res) => {
-  const { userId } = req.params;
 
-  const user = await User.findById(userId);
+  const user = await User.findById(req.user._id).populate("repos");
   if (!user)
     return res.status(404).json({ message: "User not found" });
 

@@ -35,7 +35,7 @@ export const CreateRepo = tryCatch(async (req, res) => {
 
 
 export const GetAllRepos = tryCatch(async (req, res) => {
-    const repos = await Repo.find({});
+    const repos = await Repo.find({}).sort({ createdAt: -1 });
     res.status(200).json({ repos });
 });
 
