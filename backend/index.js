@@ -8,6 +8,7 @@ import mongoose from 'mongoose';
 import userRoutes from './routes/user.route.js';
 import repoRoutes from './routes/repo.route.js';
 import issueRoutes from './routes/issue.route.js';
+import cookieParser from 'cookie-parser';
 
 dotenv.config();
 
@@ -33,32 +34,33 @@ import {pullController} from './controllers/commands/pull.js';
             }));
     app.use(express.json());
     app.use(express.urlencoded({extended: false}));
+    app.use(cookieParser());
 
     app.use('/api/user', userRoutes);
     app.use('/api/repo', repoRoutes);
     app.use('/api/issue', issueRoutes);
 
-    const httpServer = http.createServer(app);
-    const io= new Server (httpServer,{
-        cors:{
-            origin: 'http://localhost:5173',
+    // const httpServer = http.createServer(app);
+    // // const io= new Server (httpServer,{
+    // //     cors:{
+    // //         origin: 'http://localhost:5173',
             
-        }
-    })
+    // //     }
+    // // })
 
-    let user="test";
-    io.on("connection",(socket)=>{
-        socket.on("",(userID)=>{
-            user=userID;
-        })
-    })
+    // let user="test";
+    // io.on("connection",(socket)=>{
+    //     socket.on("",(userID)=>{
+    //         user=userID;
+    //     })
+    // })
 
-    const db = mongoose.connection;
-    db.once('open',async()=>{
-            console.log('CRUD opeartions called');
-    });
+    // const db = mongoose.connection;
+    // db.once('open',async()=>{
+    //         console.log('CRUD opeartions called');
+    // });
     connectDb().then(()=>{
-          httpServer.listen(PORT ,()=>{
+          app.listen(PORT ,()=>{
         console.log(`Server is running on port ${PORT}`);
     })
     });
