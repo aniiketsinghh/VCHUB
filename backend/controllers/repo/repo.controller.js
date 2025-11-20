@@ -1,20 +1,27 @@
 import Repo from "../../models/repo.model.js";
 
 const tryCatch = (fn) => async (req, res) => {
-    try {
-        await fn(req, res);
-    } catch (err) {
+    try { await fn(req, res); }
+    catch (err) {
         console.error("Controller Error:", err);
         res.status(500).json({ error: err.message });
     }
 };
 
-
+// ---------------------------
+// CREATE REPO
+// ---------------------------
 export const CreateRepo = tryCatch(async (req, res) => {
-    const { name, description, visibility, owner, content, issues } = req.body;
+    const { name, description, visibility, content } = req.body;
 
-    if (!name) return res.status(400).json({ error: "Repo name is required" });
-    if (!owner) return res.status(400).json({ error: "Owner is required" });
+    if (!name) return res.status(400).json({ error: "Repository name required" });
+
+    const owner = req.user._id;
+
+    // Prevent same user from creating same repo twice
+    const existing = await Repo.findOne({ name, owner });
+    if (existing)
+        return res.status(400).json({ error: "Repo already exists" });
 
     const repo = new Repo({
         name,
@@ -22,7 +29,8 @@ export const CreateRepo = tryCatch(async (req, res) => {
         visibility: visibility || "public",
         owner,
         content: content || [],
-        issues: issues || []
+        issues: [],
+        stars: []
     });
 
     await repo.save();
@@ -33,107 +41,105 @@ export const CreateRepo = tryCatch(async (req, res) => {
     });
 });
 
-
+// ---------------------------
+// ANYONE CAN SEE PUBLIC REPOS
+// ---------------------------
 export const GetAllRepos = tryCatch(async (req, res) => {
-    const repos = await Repo.find({}).sort({ createdAt: -1 });
+    const repos = await Repo.find().sort({ createdAt: -1 });
     res.status(200).json({ repos });
 });
 
-
+// ---------------------------
+// GET REPO BY ID
+// ---------------------------
 export const GetRepoById = tryCatch(async (req, res) => {
     const { id } = req.params;
 
     const repo = await Repo.findById(id);
-
     if (!repo) return res.status(404).json({ error: "Repo not found" });
 
     res.status(200).json({ repo });
 });
 
 // ---------------------------
-// ✅ Get Repo By Name
+// GET REPO BY NAME
 // ---------------------------
 export const GetRepoByName = tryCatch(async (req, res) => {
     const { name } = req.params;
 
     const repo = await Repo.findOne({ name });
-
     if (!repo) return res.status(404).json({ error: "Repo not found" });
 
     res.status(200).json({ repo });
 });
 
 // ---------------------------
-// ✅ Get All Repos for Current User
+// GET CURRENT USER REPOS
 // ---------------------------
 export const GetReposForCurrentUser = tryCatch(async (req, res) => {
-    const { userID } = req.params;
-
-    const repos = await Repo.find({ owner: userID });
+    const repos = await Repo.find({ owner: req.user._id });
 
     res.status(200).json({ repos });
 });
 
+// ---------------------------
+// STAR OR UNSTAR REPO
+// ---------------------------
 export const ToggleRepoStarById = tryCatch(async (req, res) => {
     const { id } = req.params;
-    const { userId } = req.body; // user stealing the repo
-
-    if (!userId)
-        return res.status(400).json({ error: "userId required to star/unstar repo" });
+    const userId = req.user._id;
 
     const repo = await Repo.findById(id);
-
     if (!repo) return res.status(404).json({ error: "Repo not found" });
 
-    const alreadyStarred = repo.stars.includes(userId);
+    const already = repo.stars.includes(userId);
 
-    if (alreadyStarred) {
-        // Remove star
-        repo.stars = repo.stars.filter(uid => uid.toString() !== userId);
+    if (already) {
+        repo.stars = repo.stars.filter(uid => uid.toString() !== userId.toString());
     } else {
-        // Add star
         repo.stars.push(userId);
     }
 
     await repo.save();
 
     res.status(200).json({
-        message: alreadyStarred ? "Star removed" : "Star added",
+        message: already ? "Star removed" : "Star added",
         totalStars: repo.stars.length,
         repo
     });
 });
 
-
+// ---------------------------
+// UPDATE REPO — OWNER ONLY
+// ---------------------------
 export const UpdateRepoById = tryCatch(async (req, res) => {
     const { id } = req.params;
 
-    const updatedRepo = await Repo.findByIdAndUpdate(
-        id,
-        { ...req.body },
-        { new: true }
-    );
+    const repo = await Repo.findById(id);
+    if (!repo) return res.status(404).json({ error: "Repo not found" });
 
-    if (!updatedRepo) return res.status(404).json({ error: "Repo not found" });
+    if (repo.owner.toString() !== req.user._id.toString())
+        return res.status(403).json({ error: "You cannot edit this repo" });
 
-    res.status(200).json({
-        message: "Repository updated successfully",
-        repo: updatedRepo
-    });
+    Object.assign(repo, req.body);
+    await repo.save();
+
+    res.status(200).json({ message: "Repo updated", repo });
 });
 
-
-// Delete Repo
-
+// ---------------------------
+// DELETE REPO — OWNER ONLY
+// ---------------------------
 export const DeleteRepoById = tryCatch(async (req, res) => {
     const { id } = req.params;
 
-    const deletedRepo = await Repo.findByIdAndDelete(id);
+    const repo = await Repo.findById(id);
+    if (!repo) return res.status(404).json({ error: "Repo not found" });
 
-    if (!deletedRepo) return res.status(404).json({ error: "Repo not found" });
+    if (repo.owner.toString() !== req.user._id.toString())
+        return res.status(403).json({ error: "You cannot delete this repo" });
 
-    res.status(200).json({
-        message: "Repository deleted successfully",
-        repo: deletedRepo
-    });
+    await repo.deleteOne();
+
+    res.status(200).json({ message: "Repo deleted", repo });
 });
