@@ -108,7 +108,7 @@ export const GetAllUsers = tryCatch(async (req, res) => {
 //get profile
 export const GetUserProfile = tryCatch(async (req, res) => {
 
-  const user = await User.findById(req.user._id).populate("repos");
+  const user = await User.findById(req.user._id);
   if (!user)
     return res.status(404).json({ message: "User not found" });
 
@@ -117,16 +117,14 @@ export const GetUserProfile = tryCatch(async (req, res) => {
 
 //update
 export const UpdateUserProfile = tryCatch(async (req, res) => {
-  const { userId } = req.params;
-  const { username, email, password } = req.body;
+  const { username, email } = req.body;
 
-  const user = await User.findById(userId);
+  const user = await User.findById(req.user._id);
   if (!user)
     return res.status(404).json({ message: "User not found" });
 
   if (username) user.username = username;
   if (email) user.email = email;
-  if (password) user.password = password; // triggers hashing via pre-save
 
   await user.save();
 
@@ -137,10 +135,9 @@ export const UpdateUserProfile = tryCatch(async (req, res) => {
 
 //delete
 export const DeleteUserProfile = tryCatch(async (req, res) => {
-  const { userId } = req.params;
   const { password } = req.body;
 
-  const user = await User.findById(userId);
+  const user = await User.findById(req.user._id);
   if (!user)
     return res.status(404).json({ message: "User not found" });
 

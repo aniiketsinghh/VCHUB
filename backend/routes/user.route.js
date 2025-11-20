@@ -8,7 +8,7 @@ router.post('/signup',Signup);
 router.post('/login',Login);
 router.get('/getallusers',GetAllUsers);
 router.get('/profile',Middleware,GetUserProfile);
-router.put('/updateprofile',UpdateUserProfile);
-router.delete('/deleteprofile',DeleteUserProfile);
+router.put('/updateprofile',Middleware,UpdateUserProfile);
+router.delete('/deleteprofile',Middleware,DeleteUserProfile);
 
 export default router;
