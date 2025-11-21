@@ -54,7 +54,7 @@ export const Signup = tryCatch(async (req, res) => {
   res.cookie("token", token, {
     httpOnly: true,
     sameSite: "none",
-    secure:false,
+    secure:true,
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
 
@@ -83,7 +83,7 @@ export const Login = tryCatch(async (req, res) => {
   res.cookie("token", token, {
     httpOnly: true,
     sameSite: "none",
-    secure:false,
+    secure:true,
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
