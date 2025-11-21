@@ -7,6 +7,7 @@ import FetchRepo from './component/repo/AllRepos';
 import RepoDetails from './component/repo/DetailsRepo';
 import Profile from './component/user/Hello';
 import SettingsPage from './Setting';
+import StarredRepos from './component/repo/AllStar';
 import { useAuth } from './context/useContext';
 
 const Router = () => {
@@ -68,6 +69,12 @@ const Router = () => {
         path="/deleterepobyid/:id"
         element={ user ? <Home /> : <Navigate to="/login" /> }
       />
+
+      <Route
+        path="/getstarredrepos"
+        element={ user ? <StarredRepos /> : <Navigate to="/login" /> }
+      />
+
     </Routes>
   );
 };

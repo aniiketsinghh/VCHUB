@@ -23,12 +23,12 @@ const Section = () => {
   }, []);
 
   return (
-    <div className="w-full h-[calc(100vh-70px)] overflow-y-auto bg-[#535968] text-white">
+    <div className="w-full h-[calc(100vh-70px)] overflow-y-auto bg-gray-800 text-white">
       <div className="w-full grid grid-cols-12 gap-8 py-10 px-6">
 
         {/* LEFT — 30% */}
         <div className="col-span-4 flex justify-start">
-          <div className="bg-[#6a6f7c] w-90 p-5 rounded-xl">
+          <div className="bg-gray-600 w-90 p-5 rounded-xl mt-10">
 
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold">Top repositories</h2>
@@ -86,7 +86,7 @@ const Section = () => {
           ) : (
             <>
               <div className="w-full text-left px-4">
-                <h2 className="text-3xl font-bold mb-6">Your Repositories</h2>
+                <h2 className="text-3xl font-bold mb-6 flex justify-center">All Repositories</h2>
 
                 <div className="space-y-4 w-full">
                   {repos.map((repo) => (
@@ -97,15 +97,19 @@ const Section = () => {
                       <p className="text-xl font-semibold">{repo.name}</p>
                       <p className="text-gray-300">{repo.description}</p>
 
-                      <span
-                        className={`inline-block mt-2 px-3 py-1 rounded-full text-sm ${
-                          repo.visibility === "public"
-                            ? "bg-green-700"
-                            : "bg-red-700"
+                     <div className="flex items-center gap-2 mt-3">
+                    <span
+                         className={`w-3 h-3 rounded-full ${
+                        repo.visibility.toLowerCase() === "public"
+                         ? "bg-green-500"
+                          : "bg-red-500"
                         }`}
-                      >
-                        {repo.visibility}
-                      </span>
+                       ></span>
+
+                    <span className="capitalize text-gray-300">
+                       {repo.visibility.toLowerCase() === "public" ? "Public" : "Private"}
+                        </span>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -117,7 +121,7 @@ const Section = () => {
 
         {/* RIGHT — 30% */}
         <div className="col-span-4 flex justify-end">
-          <div className="bg-[#6a6f7c] w-90 p-6 rounded-xl shadow-lg">
+          <div className="bg-gray-700 w-90 p-6 rounded-xl shadow-lg mt-10">
 
             <h2 className="text-2xl font-bold mb-6">How to use it</h2>
 

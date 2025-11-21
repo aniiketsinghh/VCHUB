@@ -1,4 +1,6 @@
+import {useAuth} from "../../context/useContext" 
 const Profile = () => {
+  const {user}=useAuth();
   return (
     <div className="min-h-screen w-full bg-[#0d1117] flex justify-center py-14 px-4">
       <div className="bg-[#161b22] w-full max-w-lg rounded-2xl border border-[#30363d] p-8 shadow-xl text-center">
@@ -13,13 +15,13 @@ const Profile = () => {
         </div>
 
         {/* Name + Email */}
-        <h1 className="text-white text-3xl font-semibold mt-5">Aniket Singh</h1>
-        <p className="text-gray-400 text-sm mt-1">aniket@example.com</p>
+        <h1 className="text-white text-3xl font-semibold mt-5">{user.username}</h1>
+        <p className="text-gray-400 text-sm mt-1">{user.email}</p>
 
         {/* Followers + Following */}
         <div className="flex justify-between mt-7 mb-6 gap-4">
           <div className="w-1/2 bg-[#21262d] rounded-xl p-4 border border-[#30363d]">
-            <h2 className="text-white text-2xl font-semibold">120</h2>
+            <h2 className="text-white text-2xl font-semibold">99</h2>
             <p className="text-gray-400 text-sm mt-1">Followers</p>
           </div>
           <div className="w-1/2 bg-[#21262d] rounded-xl p-4 border border-[#30363d]">

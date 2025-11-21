@@ -14,7 +14,8 @@ import {
   Star,
   FolderGit2,
   UserCircle,
-  LayoutDashboard
+  LayoutDashboard,
+  BookOpen
 } from "lucide-react";
 
 export default function Navbar() {
@@ -85,6 +86,13 @@ export default function Navbar() {
           <button className="px-4 py-1.5 bg-gray-200 rounded-lg border border-gray-500 hover:bg-gray-100">
             Explore
           </button>
+
+            <Link to="/getallrepos">
+            <button className="px-4 py-1.5 bg-gray-200 rounded-lg border border-gray-500 hover:bg-gray-100">
+             <BookOpen className="w-5 h-5 text-gray-800" />
+          </button>
+            </Link>
+
 
           <Link to="/createrepo">
             <button className="p-2 bg-gray-200 border border-gray-500 rounded-lg hover:bg-gray-100">
