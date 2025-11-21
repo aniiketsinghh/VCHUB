@@ -5,7 +5,7 @@ import { useAuth } from "../../context/useContext";
 import { useNavigate } from "react-router";
 
 const Login = () => {
-    const {setUser}=useAuth();
+    const {setUser,setUserId}=useAuth();
     const navigate=useNavigate();
   const [form,setForm]=useState({
     email:"",
@@ -29,7 +29,9 @@ const Login = () => {
         console.log(res);
         if(res.status===201){
             setUser(res.data.user)
-            localStorage.setItem("userId",res.data.user._id);
+            setUserId(res.data.user._id);
+                localStorage.setItem("user", JSON.stringify(res.data.user));
+                localStorage.setItem("userId", res.data.user._id);
             navigate("/");
         }
     }catch(err){

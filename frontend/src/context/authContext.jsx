@@ -5,14 +5,21 @@ export const AuthContext=createContext();
 
 export function AuthProvider({children}){
     const [user,setUser]=useState(null);
-    useEffect(()=>{
-       const userId=localStorage.getItem("userId");
-       if(userId){
-        setUser(userId);
-       } 
-    },[]);
+    const [userId,setUserId]=useState(null);
 
-    const value={user,setUser};
-    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+      useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const storedId = localStorage.getItem("userId");
+
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+    if (storedId) {
+      setUserId(storedId);
+    }
+  }, []);
+
+
+    return <AuthContext.Provider value={{user,setUser,userId,setUserId}}>{children}</AuthContext.Provider>
 }
     

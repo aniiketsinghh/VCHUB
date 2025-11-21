@@ -6,7 +6,7 @@ import {useNavigate } from "react-router";
 
 const Signup = () => {
 
-    const {setUser}=useAuth();
+    const {setUser,setUserId}=useAuth();
     const navigate=useNavigate();
   const [form, setForm] = useState({
     username: "",
@@ -33,7 +33,9 @@ const Signup = () => {
         console.log(res);
         if(res.status===201){
             setUser(res.data.user)
-            localStorage.setItem("userId",res.data.user._id);
+            setUserId(res.data.user._id);
+                localStorage.setItem("user", JSON.stringify(res.data.user));
+                localStorage.setItem("userId", res.data.user._id);
             navigate("/");
         }
     }catch(err){

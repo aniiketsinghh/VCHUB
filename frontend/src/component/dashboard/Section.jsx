@@ -13,7 +13,6 @@ const Section = () => {
           { withCredentials: true }
         );
 
-        // If backend returns { repos: [...] }
         setRepos(res.data.repos || []);
       } catch (err) {
         console.error(err);
@@ -24,12 +23,12 @@ const Section = () => {
   }, []);
 
   return (
-    <div className="w-full h-[calc(100vh-70px)] overflow-y-auto bg-gray-600 text-white">
+    <div className="w-full h-[calc(100vh-70px)] overflow-y-auto bg-[#535968] text-white">
       <div className="w-full grid grid-cols-12 gap-8 py-10 px-6">
-        
+
         {/* LEFT — 30% */}
-        <div className="col-span-4 flex justify-start ml-[20px]">
-          <div className="bg-zinc-500 w-90 p-5 rounded-xl">
+        <div className="col-span-4 flex justify-start">
+          <div className="bg-[#6a6f7c] w-90 p-5 rounded-xl">
 
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold">Top repositories</h2>
@@ -41,14 +40,12 @@ const Section = () => {
               </Link>
             </div>
 
-            {/* Search Bar */}
             <input
               type="text"
               placeholder="Find a repository..."
               className="w-full px-3 py-2 rounded-md bg-gray-600 border text-white text-xl font-semibold border-gray-600 focus:outline-none focus:border-gray-400"
             />
 
-            {/* LIST OF REPOSITORIES */}
             <div className="mt-4 bg-gray-700 p-3 rounded-md h-64 overflow-y-auto">
               {repos.length === 0 ? (
                 <p className="text-gray-300 text-sm">No repositories found.</p>
@@ -68,26 +65,59 @@ const Section = () => {
           </div>
         </div>
 
-        {/* MIDDLE — 40% */}
-        <div className="col-span-4 flex flex-col items-center text-center justify-center">
+        {/* MIDDLE — CONDITIONAL UI */}
+        <div className="col-span-4 flex flex-col items-center text-center justify-start w-full">
 
-          <div className="w-50 h-50 rounded-full flex justify-center items-center mb-2 overflow-hidden">
-            <img
-              src="/home.png"
-              alt="repo-logo"
-              className="w-full h-full object-cover"
-            />
-          </div>
+          {repos.length === 0 ? (
+            <>
+              <div className="w-60 h-60 rounded-full flex justify-center items-center mb-4 overflow-hidden">
+                <img
+                  src="/home.png"
+                  alt="repo-logo"
+                  className="w-full h-full object-cover"
+                />
+              </div>
 
-          <h1 className="text-3xl font-bold">Create your own repository</h1>
-          <p className="mt-3 text-gray-300 max-w-[80%]">
-            Manage, track, and version your projects easily with our powerful repository tools.
-          </p>
+              <h1 className="text-3xl font-bold">Create your own repository</h1>
+              <p className="mt-3 text-gray-300 max-w-[80%]">
+                Manage, track, and version your projects easily with our powerful repository tools.
+              </p>
+            </>
+          ) : (
+            <>
+              <div className="w-full text-left px-4">
+                <h2 className="text-3xl font-bold mb-6">Your Repositories</h2>
+
+                <div className="space-y-4 w-full">
+                  {repos.map((repo) => (
+                    <div
+                      key={repo._id}
+                      className="bg-gray-700 w-full p-4 rounded-lg hover:bg-gray-600 transition cursor-pointer"
+                    >
+                      <p className="text-xl font-semibold">{repo.name}</p>
+                      <p className="text-gray-300">{repo.description}</p>
+
+                      <span
+                        className={`inline-block mt-2 px-3 py-1 rounded-full text-sm ${
+                          repo.visibility === "public"
+                            ? "bg-green-700"
+                            : "bg-red-700"
+                        }`}
+                      >
+                        {repo.visibility}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
         </div>
 
         {/* RIGHT — 30% */}
-        <div className="col-span-4 flex justify-end mr-[20px]">
-          <div className="bg-zinc-500 w-90 p-6 rounded-xl shadow-lg">
+        <div className="col-span-4 flex justify-end">
+          <div className="bg-[#6a6f7c] w-90 p-6 rounded-xl shadow-lg">
 
             <h2 className="text-2xl font-bold mb-6">How to use it</h2>
 

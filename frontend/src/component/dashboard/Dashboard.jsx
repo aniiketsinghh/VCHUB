@@ -1,5 +1,5 @@
 import React from 'react'
-import Navbar from './NavbarFun'
+import Navbar from '../../NavbarFun'
 import Section from './Section'
 
 const Dashboard = () => {
