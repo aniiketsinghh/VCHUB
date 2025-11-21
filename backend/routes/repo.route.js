@@ -21,7 +21,6 @@ router.get('/getallrepos', GetAllRepos);
 router.get('/getrepobyid/:id', GetRepoById);
 router.get('/getrepobyname/:name', GetRepoByName);
 
-// FIXED — removed :id
 router.get('/getreposforcurrentuser', GetReposForCurrentUser);
 
 router.patch('/togglerepostarbyid/:id', ToggleRepoStarById);

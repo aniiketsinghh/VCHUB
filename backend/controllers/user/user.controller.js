@@ -133,6 +133,23 @@ export const UpdateUserProfile = tryCatch(async (req, res) => {
     .json({ message: "User updated successfully", user });
 });
 
+//logout
+export const Logout = async (req, res) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: false,
+      sameSite: "none",
+    });
+
+    return res.status(200).json({ message: "Logged out successfully" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Error logging out" });
+  }
+};
+
+
 //delete
 export const DeleteUserProfile = tryCatch(async (req, res) => {
   const { password } = req.body;
