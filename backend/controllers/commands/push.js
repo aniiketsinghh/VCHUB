@@ -17,7 +17,7 @@ export const pushController = async()=>{
                 const fileContent = await fs.readFile(filePath);
                     const params = {
                         Bucket: BUCKET_NAME,
-                        Key: `/commits${commitFolder}/${file}`,
+                        Key: `/commits/${commitFolder}/${file}`,
                         Body: fileContent,
                     };
                     await s3.upload(params).promise();

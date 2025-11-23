@@ -1,4 +1,6 @@
 import Repo from "../../models/repo.model.js";
+import { S3Client, ListObjectsV2Command } from "@aws-sdk/client-s3";
+const s3 = new S3Client({ region: "ap-south-1" });
 
 const tryCatch = (fn) => async (req, res) => {
     try { await fn(req, res); }
@@ -45,9 +47,17 @@ export const CreateRepo = tryCatch(async (req, res) => {
 // ANYONE CAN SEE PUBLIC REPOS
 // ---------------------------
 export const GetAllRepos = tryCatch(async (req, res) => {
-    const repos = await Repo.find().sort({ createdAt: -1 });
-    res.status(200).json({ repos });
+    const repos = await Repo.find().sort({ createdAt: -1 }).lean();
+    const userId = req.user?._id?.toString();
+
+    const finalRepos = repos.map(repo => ({
+        ...repo,
+        isStarred: userId ? repo.stars.some(id => id.toString() === userId) : false
+    }));
+
+    res.status(200).json({ repos: finalRepos });
 });
+
 
 // ---------------------------
 // GET REPO BY ID
@@ -110,6 +120,32 @@ export const ToggleRepoStarById = tryCatch(async (req, res) => {
 });
 
 // ---------------------------
+// GET ALL STARRED REPOS FOR CURRENT USER
+// ---------------------------
+export const GetStarredReposForCurrentUser = tryCatch(async (req, res) => {
+    const userId = req.user._id.toString();
+
+    // Find repos starred by this user
+    const repos = await Repo.find({ stars: userId })
+        .sort({ createdAt: -1 })
+        .lean();
+
+    // FORCE isStarred = true for UI consistency
+    const finalRepos = repos.map(repo => ({
+        ...repo,
+        isStarred: true
+    }));
+
+    res.status(200).json({
+        message: "Starred repos fetched successfully",
+        total: finalRepos.length,
+        repos: finalRepos
+    });
+});
+
+
+
+// ---------------------------
 // UPDATE REPO — OWNER ONLY
 // ---------------------------
 export const UpdateRepoById = tryCatch(async (req, res) => {
@@ -143,3 +179,49 @@ export const DeleteRepoById = tryCatch(async (req, res) => {
 
     res.status(200).json({ message: "Repo deleted", repo });
 });
+
+export const GetRepo = tryCatch(async (req, res) => {
+    const { reponame } = req.params;
+
+    const command = new ListObjectsV2Command({
+        Bucket: process.env.S3_BUCKET,
+        Prefix: `${reponame}/`,
+    });
+
+    const data = await s3.send(command);
+
+    if (!data.Contents || data.Contents.length === 0) {
+        return res.status(404).json({ error: "No files found in S3" });
+    }
+
+    const keys = data.Contents.map(obj => obj.Key);
+
+    // Build folder-tree
+    const tree = buildTreeFromKeys(keys);
+
+    res.status(200).json({ tree });
+});
+
+
+function buildTreeFromKeys(keys) {
+  const tree = {};
+
+  keys.forEach(key => {
+    const parts = key.split("/");
+    parts.shift(); // remove repoName
+
+    let current = tree;
+
+    parts.forEach((part, idx) => {
+      if (!current[part]) {
+        current[part] = idx === parts.length - 1 ? "file" : {};
+      }
+      if (typeof current[part] === "object") {
+        current = current[part];
+      }
+    });
+  });
+
+  return tree;
+}
+
