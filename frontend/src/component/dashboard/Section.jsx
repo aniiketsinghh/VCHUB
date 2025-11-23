@@ -89,15 +89,18 @@ const Section = () => {
                 <h2 className="text-3xl font-bold mb-6 flex justify-center">All Repositories</h2>
 
                 <div className="space-y-4 w-full">
+
                   {repos.map((repo) => (
+                    <Link to={`/repo/${repo.name}/files`}>
                     <div
                       key={repo._id}
-                      className="bg-gray-700 w-full p-4 rounded-lg hover:bg-gray-600 transition cursor-pointer"
+                      className="bg-gray-700 w-full p-4 rounded-lg hover:bg-gray-600 transition cursor-pointer my-10"
                     >
                       <p className="text-xl font-semibold">{repo.name}</p>
                       <p className="text-gray-300">{repo.description}</p>
 
                      <div className="flex items-center gap-2 mt-3">
+                      
                     <span
                          className={`w-3 h-3 rounded-full ${
                         repo.visibility.toLowerCase() === "public"
@@ -111,6 +114,7 @@ const Section = () => {
                         </span>
                       </div>
                     </div>
+                    </Link>
                   ))}
                 </div>
               </div>

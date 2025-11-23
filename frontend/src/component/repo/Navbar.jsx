@@ -44,7 +44,7 @@ const Navbar = () => {
       </button>
 
       {/* Star Repo */}
-      <Link to="/getstarredrepos" className="w-1/3">
+      <Link to="/starrepo" className="w-1/3">
         <button
           className={`w-full py-4 text-center relative transition  
             ${active === "star" ? "font-semibold text-white" : "opacity-70 hover:opacity-100"}

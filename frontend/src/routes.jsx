@@ -4,7 +4,7 @@ import Signup from './component/auth/Signup';
 import Home from './component/dashboard/Dashboard';
 import CreateRepo from './component/repo/CreateRepo';
 import FetchRepo from './component/repo/AllRepos';
-import RepoDetails from './component/repo/DetailsRepo';
+import RepoFilesPage from './component/repo/DetailsRepo';
 import Profile from './component/user/Hello';
 import SettingsPage from './Setting';
 import StarredRepos from './component/repo/AllStar';
@@ -48,13 +48,15 @@ const Router = () => {
 
       <Route
         path="/getallrepos"
-        element={ user ? <FetchRepo /> : <Navigate to="/login" /> }
+        element={  <FetchRepo /> }
       />
 
       <Route
-        path="/getrepo/:id"
-        element={ user ? <RepoDetails /> : <Navigate to="/login" /> }
+         path="/repo/:repoName/files"
+         element={ user ? <RepoFilesPage /> : <Navigate to="/login" /> }
       />
+
+
 
       {/* All similar protected routes */}
       <Route
@@ -62,7 +64,7 @@ const Router = () => {
         element={ user ? <Home /> : <Navigate to="/login" /> }
       />
       <Route
-        path="/toggleuserstarbyid/:id"
+        path="/togglerepostarbyid/:id/"
         element={ user ? <Home /> : <Navigate to="/login" /> }
       />
       <Route
@@ -71,8 +73,8 @@ const Router = () => {
       />
 
       <Route
-        path="/getstarredrepos"
-        element={ user ? <StarredRepos /> : <Navigate to="/login" /> }
+        path="/starrepo"
+        element={ <StarredRepos />  }
       />
 
     </Routes>

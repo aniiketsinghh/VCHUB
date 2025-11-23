@@ -14,7 +14,7 @@ const StarredRepos = () => {
           "http://localhost:5006/api/repo/getstarredrepos",
           { withCredentials: true }
         );
-        setRepos(res.data.repos || []);
+        setRepos(res.data.repos);
       } catch (error) {
         console.log(error);
       } finally {

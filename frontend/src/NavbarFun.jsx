@@ -79,9 +79,12 @@ export default function Navbar() {
           </div>
 
           {/* BUTTONS */}
+         <Link to="/starrepo">
           <button className="px-4 py-1.5 bg-gray-200 rounded-lg border border-gray-500 hover:bg-gray-100">
-            StarRepo
-          </button>
+             StarRepo
+         </button>
+          </Link>
+
 
           <button className="px-4 py-1.5 bg-gray-200 rounded-lg border border-gray-500 hover:bg-gray-100">
             Explore
@@ -135,8 +138,9 @@ export default function Navbar() {
                   <Link to="/getallrepos">
                     <DropdownItem icon={<FolderGit2 />} text="Repositories" />
                   </Link>
-
+                  <Link to="/starrepo">
                   <DropdownItem icon={<Star />} text="Stars" />
+                  </Link>
 
                   <Link to="/settings">
                     <DropdownItem icon={<Settings />} text="Settings" />

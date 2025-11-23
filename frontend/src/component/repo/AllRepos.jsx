@@ -77,7 +77,7 @@ const FetchRepo = () => {
       try {
         const res = await axios.get(
           "http://localhost:5006/api/repo/getallrepos",
-          { withCredentials: true }
+        
         );
         setRepos(res.data.repos || []);
       } catch (err) {
