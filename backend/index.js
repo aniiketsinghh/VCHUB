@@ -40,25 +40,7 @@ import {pullController} from './controllers/commands/pull.js';
     app.use('/api/repo', repoRoutes);
     app.use('/api/issue', issueRoutes);
 
-    // const httpServer = http.createServer(app);
-    // // const io= new Server (httpServer,{
-    // //     cors:{
-    // //         origin: 'http://localhost:5173',
-            
-    // //     }
-    // // })
-
-    // let user="test";
-    // io.on("connection",(socket)=>{
-    //     socket.on("",(userID)=>{
-    //         user=userID;
-    //     })
-    // })
-
-    // const db = mongoose.connection;
-    // db.once('open',async()=>{
-    //         console.log('CRUD opeartions called');
-    // });
+ 
     connectDb().then(()=>{
           app.listen(PORT ,()=>{
         console.log(`Server is running on port ${PORT}`);
@@ -86,6 +68,20 @@ yargs(hideBin(process.argv))
 
     //pull
     .command("pull", "Pull changes from remote", {}, pullController)
+
+     .command(
+    "revert <commitId>",
+    "Revert to a specific commit",
+    (yargs) => {
+      yargs.positional("commitID", {
+        describe: "Comit ID to revert to",
+        type: "string",
+      });
+    },
+    (argv) => {
+      revertRepo(argv.commitID);
+    }
+  )
 
     //revert
     .demandCommand(1, "You need to specify at least one command")
