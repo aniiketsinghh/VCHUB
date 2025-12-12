@@ -79,7 +79,7 @@ export default function Navbar() {
           </div>
 
           {/* BUTTONS */}
-         <Link to="/starrepo">
+         <Link to="/">
           <button className="px-4 py-1.5 bg-gray-200 rounded-lg border border-gray-500 hover:bg-gray-100">
              StarRepo
          </button>
