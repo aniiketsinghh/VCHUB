@@ -2,16 +2,16 @@ import express from 'express';
 const router = express.Router();
 
 import {
-    CreateRepo,
-    GetAllRepos,
-    GetRepoById,
-    GetRepoByName,
-    GetReposForCurrentUser,
-    ToggleRepoStarById,
-    UpdateRepoById,
-    DeleteRepoById,
-    GetStarredReposForCurrentUser,
-     GetRepo
+  CreateRepo,
+  GetAllRepos,
+  GetRepoById,
+  GetRepoByName,
+  GetReposForCurrentUser,
+  ToggleRepoStarById,
+  UpdateRepoById,
+  DeleteRepoById,
+  GetStarredReposForCurrentUser,
+  GetRepo,
 } from '../controllers/repo/repo.controller.js';
 
 import Middleware from '../middleware/authentication.middleware.js';
