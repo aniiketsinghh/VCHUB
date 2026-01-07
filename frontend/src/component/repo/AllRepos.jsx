@@ -124,7 +124,9 @@ const FetchRepo = () => {
               </div>
 
               {/* Repo Name */}
+              <Link to={`/repo/${repo.name}/files`}>
               <p className="text-xl font-semibold text-white">{repo.name}</p>
+              </Link>
 
               {/* Description */}
               <p className="text-gray-300 mt-1">{repo.description}</p>

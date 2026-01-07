@@ -5,7 +5,7 @@ import Home from './component/dashboard/Dashboard';
 import CreateRepo from './component/repo/CreateRepo';
 import FetchRepo from './component/repo/AllRepos';
 import RepoFilesPage from './component/repo/DetailsRepo';
-import Profile from './component/user/Hello';
+import Profile from './component/profile/profile';
 import SettingsPage from './Setting';
 import StarredRepos from './component/repo/AllStar';
 import { useAuth } from './context/useContext';
