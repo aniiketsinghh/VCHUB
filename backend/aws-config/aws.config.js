@@ -10,4 +10,4 @@ AWS.config.update({
 });
 
 export const s3 = new AWS.S3();
-export const BUCKET_NAME = 'vchubbucket';
+export const BUCKET_NAME = 'vchubfinalbucket';
